@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model TestSession {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+
+  // 受験者情報（PoC版なので匿名）
+  candidateId String?
+
+  // テストステータス
+  status      String   @default("in_progress") // in_progress, completed
+
+  // 課題ID（どの課題を選択したか）
+  problemId   String?
+
+  // 関連データ
+  logs        OperationLog[]
+  result      TestResult?
+}
+
+model OperationLog {
+  id        String   @id @default(cuid())
+  sessionId String
+  session   TestSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  timestamp DateTime @default(now())
+
+  // 操作種別
+  eventType String   // CELL_EDIT, FILTER_APPLY, FORMULA_INPUT, COPY_PASTE, SUBMIT
+
+  // 操作詳細（JSON形式）
+  eventData String   // セル座標、入力値、数式内容など
+
+  @@index([sessionId])
+}
+
+model TestResult {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+  session   TestSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  // スコアリング結果
+  score     Int      // 0-100
+  method    String   // 使用した手法: "関数活用", "フィルター機能", "手動作業"
+
+  // 詳細分析（JSON形式）
+  analysis  String   // 操作サマリー、所要時間、検出された関数など
+}

@@ -1,0 +1,412 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Excel風スプレッドシートのカスタムスタイル */
+
+/* テーブル全体 */
+.handsontable {
+  font-family: Calibri, 'Yu Gothic', '游ゴシック', YuGothic, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif !important;
+  font-size: 11pt !important;
+  color: #000000 !important;
+}
+
+/* ヘッダーセル（列名: A, B, C...） */
+.handsontable thead th {
+  background-color: #F2F2F2 !important;
+  background-image: none !important;
+  border-right: 1px solid #D4D4D4 !important;
+  border-bottom: 1px solid #D4D4D4 !important;
+  border-top: 1px solid #D4D4D4 !important;
+  border-left: 1px solid #D4D4D4 !important;
+  font-weight: 400 !important;
+  font-size: 10pt !important;
+  color: #000000 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 4px 2px !important;
+  height: 20px !important;
+}
+
+/* データセル */
+.handsontable td {
+  border-top: 1px solid #D4D4D4 !important;
+  border-right: 1px solid #D4D4D4 !important;
+  border-bottom: 1px solid #D4D4D4 !important;
+  border-left: 1px solid #D4D4D4 !important;
+  padding: 2px 4px !important;
+  background-color: #FFFFFF !important;
+  vertical-align: middle !important;
+  color: #000000 !important;
+  font-size: 11pt !important;
+  height: 21px !important;
+  line-height: 1.2 !important;
+}
+
+/* 行番号（行ヘッダー: 1, 2, 3...） */
+.handsontable tbody th,
+.handsontable thead th.ht__highlight {
+  background-color: #F2F2F2 !important;
+  background-image: none !important;
+  border-right: 1px solid #D4D4D4 !important;
+  border-bottom: 1px solid #D4D4D4 !important;
+  border-top: 1px solid #D4D4D4 !important;
+  border-left: 1px solid #D4D4D4 !important;
+  font-weight: 400 !important;
+  font-size: 10pt !important;
+  color: #000000 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 2px 4px !important;
+  min-width: 40px !important;
+  height: 21px !important;
+}
+
+/* ホバー時のハイライト（Excelの薄いグレー） */
+.handsontable tbody th:hover,
+.handsontable thead th:hover {
+  background-color: #E8E8E8 !important;
+}
+
+/* 選択されたセル（Excelの緑色の太いボーダー） */
+.handsontable td.current {
+  background-color: #FFFFFF !important;
+  border: 2px solid #217346 !important;
+  box-shadow: inset 0 0 0 1px #217346 !important;
+}
+
+/* 範囲選択（Excelの薄い青） */
+.handsontable td.area {
+  background-color: #E7F3FF !important;
+}
+
+/* フィルターボタン（Excelスタイル） */
+.handsontable .changeType,
+.handsontable .htFiltersIcon,
+.handsontable button.changeType {
+  opacity: 0.7 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  color: #5A5A5A !important;
+  margin-left: 2px !important;
+  font-size: 8pt !important;
+}
+
+.handsontable thead th .relative {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+}
+
+/* フィルターボタンのアイコン */
+.handsontable .htUIButton {
+  opacity: 0.7 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* ヘッダーにホバーした時にボタンを強調 */
+.handsontable thead th:hover .changeType,
+.handsontable thead th:hover button {
+  opacity: 1 !important;
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* ドロップダウンメニュー（Excelスタイル） */
+.handsontable .htDropdownMenu {
+  border: 1px solid #ABABAB !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+  border-radius: 0 !important;
+  font-family: Calibri, 'Yu Gothic', '游ゴシック', sans-serif !important;
+  font-size: 11pt !important;
+}
+
+/* グリッドライン */
+.handsontable table {
+  border-collapse: collapse !important;
+}
+
+/* テーブルの外枠（Excelスタイル） */
+.handsontable {
+  border: 1px solid #ABABAB !important;
+}
+
+/* 編集中のセル（Excelスタイル） */
+.handsontable td.htEditor {
+  background-color: #FFFFFF !important;
+  border: 2px solid #217346 !important;
+  padding: 2px 4px !important;
+}
+
+/* 入力エディタ */
+.handsontable .handsontableInput {
+  font-family: Calibri, 'Yu Gothic', '游ゴシック', sans-serif !important;
+  font-size: 11pt !important;
+  color: #000000 !important;
+  padding: 2px 4px !important;
+  border: none !important;
+}
+
+/* スクロールバー（Excelスタイル） */
+.handsontable .wtHolder {
+  scrollbar-width: thin;
+  scrollbar-color: #CDCDCD #F5F5F5;
+}
+
+.handsontable .wtHolder::-webkit-scrollbar {
+  width: 17px;
+  height: 17px;
+}
+
+.handsontable .wtHolder::-webkit-scrollbar-track {
+  background: #F5F5F5;
+  border-left: 1px solid #D4D4D4;
+  border-top: 1px solid #D4D4D4;
+}
+
+.handsontable .wtHolder::-webkit-scrollbar-thumb {
+  background: #CDCDCD;
+  border: 1px solid #ABABAB;
+  border-radius: 0;
+}
+
+.handsontable .wtHolder::-webkit-scrollbar-thumb:hover {
+  background: #A6A6A6;
+}
+
+/* スクロールバーのコーナー */
+.handsontable .wtHolder::-webkit-scrollbar-corner {
+  background: #F2F2F2;
+}
+
+/* 左上の角セル */
+.handsontable .ht_clone_top_left_corner thead th {
+  background-color: #F2F2F2 !important;
+  border: 1px solid #D4D4D4 !important;
+}
+
+/* 右揃えのセル */
+.handsontable td.htRight {
+  text-align: right !important;
+}
+
+/* 中央揃えのセル */
+.handsontable td.htCenter {
+  text-align: center !important;
+}
+
+/* 左揃えのセル（デフォルト） */
+.handsontable td.htLeft {
+  text-align: left !important;
+}
+
+/* セルの垂直方向の配置 */
+.handsontable td.htMiddle {
+  vertical-align: middle !important;
+}
+
+/* 選択範囲のハイライト（複数セル選択時） */
+.handsontable .ht__highlight {
+  background-color: #E7F3FF !important;
+}
+
+/* アクティブなヘッダー（選択中の列・行） */
+.handsontable th.ht__active_highlight {
+  background-color: #E8E8E8 !important;
+}
+
+/* フィルターアイコンが有効な時 */
+.handsontable .htFiltersConditionComponent {
+  font-family: Calibri, 'Yu Gothic', '游ゴシック', sans-serif !important;
+  font-size: 11pt !important;
+}
+
+/* セルのテキストが長い場合の省略表示 */
+.handsontable td {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* コピー選択時の破線ボーダー（Excelスタイル） */
+.handsontable .ht__selection--area-corner {
+  background-color: #217346 !important;
+}
+
+.handsontable .ht__selection--area {
+  background-color: transparent !important;
+  border: 1px dashed #217346 !important;
+}
+
+/* フリーズペイン風のヘッダー固定 */
+.handsontable .ht_clone_top {
+  z-index: 101 !important;
+}
+
+.handsontable .ht_clone_left {
+  z-index: 102 !important;
+}
+
+/* 数式バー風の入力（編集時） */
+.handsontable textarea.handsontableInput {
+  font-family: Calibri, 'Yu Gothic', '游ゴシック', sans-serif !important;
+  font-size: 11pt !important;
+  resize: none !important;
+}
+
+/* フォントスタイル */
+.handsontable td.htBold {
+  font-weight: bold !important;
+}
+
+.handsontable td.htItalic {
+  font-style: italic !important;
+}
+
+.handsontable td.htUnderline {
+  text-decoration: underline !important;
+}
+
+/* 枠線スタイル */
+.handsontable tbody tr td.htBorderAll {
+  border-top: 2px solid #000 !important;
+  border-right: 2px solid #000 !important;
+  border-bottom: 2px solid #000 !important;
+  border-left: 2px solid #000 !important;
+  border-color: #000 !important;
+  box-sizing: border-box !important;
+}
+
+.handsontable tbody tr td.htBorderOuter {
+  border-top: 2px solid #000 !important;
+  border-right: 2px solid #000 !important;
+  border-bottom: 2px solid #000 !important;
+  border-left: 2px solid #000 !important;
+  border-color: #000 !important;
+  box-sizing: border-box !important;
+}
+
+.handsontable tbody tr td.htBorderNone {
+  border-top: 1px solid #D4D4D4 !important;
+  border-right: 1px solid #D4D4D4 !important;
+  border-bottom: 1px solid #D4D4D4 !important;
+  border-left: 1px solid #D4D4D4 !important;
+  border-color: #D4D4D4 !important;
+}
+
+.handsontable tbody tr td.htBorderTop {
+  border-top-width: 2px !important;
+  border-top-style: solid !important;
+  border-top-color: #000 !important;
+}
+
+.handsontable tbody tr td.htBorderBottom {
+  border-bottom-width: 2px !important;
+  border-bottom-style: solid !important;
+  border-bottom-color: #000 !important;
+}
+
+.handsontable tbody tr td.htBorderLeft {
+  border-left-width: 2px !important;
+  border-left-style: solid !important;
+  border-left-color: #000 !important;
+}
+
+.handsontable tbody tr td.htBorderRight {
+  border-right-width: 2px !important;
+  border-right-style: solid !important;
+  border-right-color: #000 !important;
+}
+
+.handsontable tbody tr td.htBorderOuterThick {
+  border-top: 4px solid #000 !important;
+  border-right: 4px solid #000 !important;
+  border-bottom: 4px solid #000 !important;
+  border-left: 4px solid #000 !important;
+  border-color: #000 !important;
+  box-sizing: border-box !important;
+}
+
+.handsontable tbody tr td.htBorderBottomDouble {
+  border-bottom-width: 3px !important;
+  border-bottom-style: double !important;
+  border-bottom-color: #000 !important;
+}
+
+.handsontable tbody tr td.htBorderTopBottom {
+  border-top-width: 2px !important;
+  border-top-style: solid !important;
+  border-top-color: #000 !important;
+  border-bottom-width: 2px !important;
+  border-bottom-style: solid !important;
+  border-bottom-color: #000 !important;
+}
+
+/* 行番号列（A列）のスタイル - 行ヘッダーと同じ見た目 */
+.handsontable td[class*="htMiddle"][class*="htCenter"]:read-only {
+  background-color: #F2F2F2 !important;
+  background-image: none !important;
+  border-right: 1px solid #D4D4D4 !important;
+  border-bottom: 1px solid #D4D4D4 !important;
+  border-top: 1px solid #D4D4D4 !important;
+  border-left: 1px solid #D4D4D4 !important;
+  font-weight: 400 !important;
+  font-size: 10pt !important;
+  color: #000000 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 2px 4px !important;
+  min-width: 40px !important;
+  height: 21px !important;
+}
+
+/* A列（行番号列）のフィルターアイコンを非表示 */
+.handsontable thead th:first-child button,
+.handsontable thead th:first-child .changeType,
+.handsontable thead th:first-child .htUIButton {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* エラーセルのスタイル（Excelスタイル） */
+.handsontable td.error-cell {
+  color: #DC2626 !important;
+  font-weight: bold !important;
+  background-color: #FEE2E2 !important;
+}
+
+/* スピルセルのスタイル（Excelスタイル） */
+.handsontable td.spill-cell {
+  border: 1px solid #4472C4 !important;
+  background-color: #F2F6FC !important;
+}
+
+.handsontable td.spill-origin {
+  border: 2px solid #4472C4 !important;
+  box-shadow: inset 0 0 0 1px #4472C4 !important;
+}
