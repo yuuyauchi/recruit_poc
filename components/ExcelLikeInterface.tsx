@@ -51,22 +51,21 @@ export default function ExcelLikeInterface({
   const [sheets, setSheets] = useState<Sheet[]>(() => {
     console.log('Initializing sheets with data length:', data.length);
 
-    // Sheet1: 各行の先頭に行番号を追加
+    // Sheet1 (データシート): 各行の先頭に行番号を追加 - 完全読み取り専用
     const sheet1Data = data.map((row, index) => [String(index + 1), ...row]);
 
-    // Sheet2とSheet3: 空の500行、各行の先頭に行番号
+    // Sheet2 (解答シート): 空の500行、各行の先頭に行番号 - 編集可能
     const emptySheetData = Array(500).fill(null).map((_, rowIndex) => {
       const row = Array(data[0].length).fill('');
       return [String(rowIndex + 1), ...row];
     });
 
-    console.log('Sheet1 total rows:', sheet1Data.length);
-    console.log('Sheet2 total rows:', emptySheetData.length);
+    console.log('Data sheet total rows:', sheet1Data.length);
+    console.log('Answer sheet total rows:', emptySheetData.length);
 
     return [
-      { id: 'sheet1', name: 'Sheet1', data: sheet1Data, cellStyles: new Map(), spillRanges: [], cellFormulas: new Map() },
-      { id: 'sheet2', name: 'Sheet2', data: emptySheetData, cellStyles: new Map(), spillRanges: [], cellFormulas: new Map() },
-      { id: 'sheet3', name: 'Sheet3', data: emptySheetData, cellStyles: new Map(), spillRanges: [], cellFormulas: new Map() },
+      { id: 'data-sheet', name: 'データ', data: sheet1Data, cellStyles: new Map(), spillRanges: [], cellFormulas: new Map() },
+      { id: 'answer-sheet', name: '📝解答シート', data: emptySheetData, cellStyles: new Map(), spillRanges: [], cellFormulas: new Map() },
     ];
   });
   const [activeSheetIndex, setActiveSheetIndex] = useState<number>(0);
@@ -2002,6 +2001,11 @@ export default function ExcelLikeInterface({
               cellProperties.readOnly = true;
               cellProperties.className = 'htMiddle htCenter';
               return cellProperties;
+            }
+
+            // データシート（Sheet1, index=0）は完全に読み取り専用
+            if (activeSheetIndex === 0) {
+              cellProperties.readOnly = true;
             }
 
             // デフォルトのクラス名を設定
