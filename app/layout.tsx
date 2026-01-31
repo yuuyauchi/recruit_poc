@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "handsontable/dist/handsontable.full.min.css";
+import IdleTimer from "@/components/IdleTimer";
 
 export const metadata: Metadata = {
   title: "SkillLens PoC - 事務職スキルアセスメント",
@@ -14,7 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        <IdleTimer timeout={7200000} /> {/* 2時間 = 7200000ms */}
+        {children}
+      </body>
     </html>
   );
 }
