@@ -1963,7 +1963,7 @@ export default function ExcelLikeInterface({
       </div>
 
       {/* スプレッドシートエリア */}
-      <div className="flex-1 bg-white" style={{ height: '600px' }}>
+      <div className="flex-1 bg-white overflow-hidden">
         <HotTable
           key={`sheet-${activeSheetIndex}-${isFilterEnabled}`}
           ref={hotRef}
