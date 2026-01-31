@@ -38,23 +38,26 @@ export async function POST(request: Request) {
       );
     }
 
-    // JWTトークンを生成
+    // JWTトークンを生成（2時間の有効期限）
     const secret = new TextEncoder().encode(JWT_SECRET);
     const token = await new SignJWT({ username: user.username })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
-      .setExpirationTime('24h')
+      .setExpirationTime('2h')
       .sign(secret);
 
     // HTTPOnly Cookieにトークンを設定
     const cookieStore = await cookies();
-    cookieStore.set('auth-token', token, {
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24, // 24時間
+      sameSite: 'lax' as const,
+      maxAge: 60 * 60 * 2, // 2時間
       path: '/',
-    });
+    };
+
+    console.log('[Login] Setting cookie with options:', cookieOptions);
+    cookieStore.set('auth-token', token, cookieOptions);
 
     return NextResponse.json({ success: true, username: user.username });
   } catch (error) {

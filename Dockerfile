@@ -5,6 +5,9 @@ FROM node:20-alpine AS base
 FROM base AS deps
 WORKDIR /app
 
+# Prisma用の依存関係をインストール
+RUN apk add --no-cache libc6-compat openssl
+
 # 依存関係ファイルをコピー
 COPY package.json package-lock.json* ./
 
@@ -33,6 +36,9 @@ RUN npm run build
 # プロダクションステージ
 FROM base AS runner
 WORKDIR /app
+
+# Prisma用の依存関係をインストール
+RUN apk add --no-cache libc6-compat openssl
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

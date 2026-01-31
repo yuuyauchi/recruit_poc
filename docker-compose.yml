@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -21,6 +19,19 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: skilllens-cloudflared
+    command: tunnel --config /etc/cloudflared/config.yml run
+    profiles:
+      - deploy
+    volumes:
+      - ./.cloudflared:/etc/cloudflared:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+    network_mode: host
 
 volumes:
   db-data:

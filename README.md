@@ -111,6 +111,97 @@ npm run dev
 
 ---
 
+## 🐳 Dockerセットアップ（推奨）
+
+Dockerを使用することで、環境構築を簡略化し、本番環境に近い状態でアプリケーションを実行できます。
+
+### 前提条件
+- Docker Desktop がインストールされていること
+- Docker Compose が利用可能であること
+
+### 1. 環境変数の設定（オプション）
+
+`.env.local` ファイルを作成して環境変数を設定します：
+
+```bash
+cp .env.example .env.local
+```
+
+### 2. Dockerイメージのビルドと起動
+
+```bash
+docker-compose up -d --build
+```
+
+### 3. アプリケーションにアクセス
+
+ブラウザで以下のURLにアクセス：
+```
+http://localhost:3000
+```
+
+### 4. ログイン情報
+
+- **ユーザーID**: `mugen2026`
+- **パスワード**: `maedaoguramugen`
+
+### Dockerコマンド
+
+#### ローカル開発モード（アプリケーションのみ）
+
+```bash
+# アプリケーションの起動
+docker-compose up -d
+
+# アプリケーションの停止
+docker-compose down
+
+# アプリケーションの再起動
+docker-compose restart
+
+# ログの確認
+docker-compose logs -f app
+
+# コンテナの状態確認
+docker-compose ps
+
+# データベースのリセット
+docker-compose down -v
+docker-compose up -d --build
+```
+
+#### デプロイモード（Cloudflare Tunnel付き）
+
+Cloudflare Tunnelを使用して、アプリケーションを外部公開する場合：
+
+```bash
+# デプロイモードで起動（アプリケーション + Cloudflare Tunnel）
+docker-compose --profile deploy up -d
+
+# デプロイモードで停止
+docker-compose --profile deploy down
+
+# Cloudflare Tunnelのログを確認
+docker logs skilllens-cloudflared -f
+```
+
+**前提条件**:
+- `.cloudflared/config.yml` が設定されていること
+- Cloudflare Tunnelの認証情報が `~/.cloudflared/` に存在すること
+
+### プロダクション vs 開発モード
+
+現在の設定はプロダクションモード（`npm run build` + `npm run start`）です。
+
+**プロダクションモードの利点**:
+- ⚡ **高速**: 5-10倍速い
+- 📦 **最適化済み**: コード圧縮、Tree Shaking
+- 🚀 **本番環境向け**: SSR、ISRが最適化
+
+詳細は [DOCKER_SETUP.md](./DOCKER_SETUP.md) を参照してください。
+
+---
+
 ## 📖 使い方
 
 ### 1. テスト開始

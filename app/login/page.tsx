@@ -1,18 +1,29 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [idleLogout, setIdleLogout] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // アイドルタイムアウトによるログアウトをチェック
+  useEffect(() => {
+    const reason = searchParams.get('reason');
+    if (reason === 'idle') {
+      setIdleLogout(true);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIdleLogout(false);
     setLoading(true);
 
     try {
@@ -80,6 +91,12 @@ export default function LoginPage() {
               autoComplete="current-password"
             />
           </div>
+
+          {idleLogout && (
+            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
+              2時間操作がなかったため、セキュリティのため自動的にログアウトしました。
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
