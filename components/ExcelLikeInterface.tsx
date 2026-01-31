@@ -848,16 +848,6 @@ export default function ExcelLikeInterface({
       const [row, col, oldValue, newValue] = change;
 
       if (typeof row === 'number' && typeof col === 'number') {
-        // セルを削除する場合、数式も削除
-        if (newValue === null || newValue === '') {
-          const cellKey = `${row},${col}`;
-          if (sheets[activeSheetIndex].cellFormulas.has(cellKey)) {
-            const updatedSheets = [...sheets];
-            updatedSheets[activeSheetIndex].cellFormulas.delete(cellKey);
-            setSheets(updatedSheets);
-          }
-        }
-
         // このセルがスピル範囲内かチェック
         const spillRange = isSpilledCell(row, col);
 
@@ -875,16 +865,27 @@ export default function ExcelLikeInterface({
               hot.setDataAtCell(row, col, originalValue, 'loadData');
             }
           } else {
-            // 起点セルが編集または削除された場合、スピル範囲と数式をクリア
+            // 起点セルが編集または削除される場合、beforeChangeではスピル範囲をクリアするのみ
+            // （数式の削除とシート状態の更新はafterChangeで行う）
             console.log(`[Spill] Origin cell edited, clearing spill range`);
-            clearSpillRange(row, col);
+            const hot = hotRef.current?.hotInstance;
+            if (hot) {
+              // スピル範囲を見つける
+              const currentSpillRanges = sheets[activeSheetIndex].spillRanges;
+              const range = currentSpillRanges.find(
+                r => r.originRow === row && r.originCol === col
+              );
 
-            // 数式も削除（空の値に変更された場合）
-            if (newValue === null || newValue === '') {
-              const cellKey = `${row},${col}`;
-              const updatedSheets = [...sheets];
-              updatedSheets[activeSheetIndex].cellFormulas.delete(cellKey);
-              setSheets(updatedSheets);
+              if (range) {
+                // スピルされたセルをクリア（起点以外）
+                for (let r = 0; r < range.rows; r++) {
+                  for (let c = 0; c < range.cols; c++) {
+                    if (r !== 0 || c !== 0) {
+                      hot.setDataAtCell(range.originRow + r, range.originCol + c, '', 'loadData');
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -1031,6 +1032,24 @@ export default function ExcelLikeInterface({
             updatedSheets[activeSheetIndex].data[sheetRowIndex][col] = newValue;
           }
 
+          // セルを削除する場合、保存されている数式とスピル範囲も削除
+          if (newValue === null || newValue === '') {
+            const cellKey = `${row},${col}`;
+
+            // 数式を削除
+            updatedSheets[activeSheetIndex].cellFormulas.delete(cellKey);
+
+            // スピル範囲を削除（このセルが起点の場合）
+            const spillRanges = updatedSheets[activeSheetIndex].spillRanges;
+            const spillIndex = spillRanges.findIndex(
+              range => range.originRow === row && range.originCol === col
+            );
+            if (spillIndex >= 0) {
+              console.log(`[Spill] Removing spill range for cell (${row}, ${col})`);
+              spillRanges.splice(spillIndex, 1);
+            }
+          }
+
           // 通常のセル編集イベント
           onLogEvent({
             eventType: 'CELL_EDIT',
@@ -1109,7 +1128,7 @@ export default function ExcelLikeInterface({
 
       // cellStylesRefからセルの書式状態を取得してボタンの状態を更新
       const styles = cellStylesRef.current.get(cellKey);
-      
+
       if (styles) {
         setIsBold(styles.has('htBold'));
         setIsItalic(styles.has('htItalic'));
@@ -1120,6 +1139,49 @@ export default function ExcelLikeInterface({
         setIsUnderline(false);
       }
     }
+  };
+
+  // 数式バーでEnterキーが押されたときの処理
+  const handleFormulaBarKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      commitFormulaBarValue();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      // セルの現在値に戻す
+      const hot = hotRef.current?.hotInstance;
+      if (hot) {
+        const selected = hot.getSelected();
+        if (selected && selected.length > 0) {
+          const [row, col] = selected[0];
+          const cellKey = `${row},${col}`;
+          const formula = sheets[activeSheetIndex].cellFormulas.get(cellKey);
+          if (formula) {
+            setFormulaBarValue(formula);
+          } else {
+            const cellValue = hot.getDataAtCell(row, col);
+            setFormulaBarValue(cellValue || '');
+          }
+        }
+      }
+    }
+  };
+
+  // 数式バーの値をセルに反映
+  const commitFormulaBarValue = () => {
+    const hot = hotRef.current?.hotInstance;
+    if (!hot) return;
+
+    const selected = hot.getSelected();
+    if (!selected || selected.length === 0) return;
+
+    const [row, col] = selected[0];
+
+    // A列（行番号列）は編集不可
+    if (col === 0) return;
+
+    // 数式バーの値をセルに設定
+    hot.setDataAtCell(row, col, formulaBarValue, 'edit');
   };
 
   const ribbonTabs = [
@@ -1893,6 +1955,7 @@ export default function ExcelLikeInterface({
               type="text"
               value={formulaBarValue}
               onChange={(e) => setFormulaBarValue(e.target.value)}
+              onKeyDown={handleFormulaBarKeyDown}
               placeholder="数式を入力"
               className="flex-1 px-2 py-1 text-sm outline-none"
             />
