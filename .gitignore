@@ -51,3 +51,9 @@ Thumbs.db
 # Temporary files
 tmp/
 temp/
+
+# Prompt files
+prompt*.txt
+
+# Cloudflare Tunnel credentials
+.cloudflared/
