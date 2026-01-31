@@ -33,10 +33,14 @@ export async function middleware(request: NextRequest) {
   // トークンを取得
   const token = request.cookies.get('auth-token')?.value;
 
+  // デバッグログ
+  console.log('[Middleware] Path:', pathname, 'Has token:', !!token);
+
   if (!token) {
     // トークンがない場合、ログインページにリダイレクト
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
+    console.log('[Middleware] Redirecting to login:', loginUrl.toString());
     return NextResponse.redirect(loginUrl);
   }
 

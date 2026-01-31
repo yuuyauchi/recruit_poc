@@ -147,6 +147,8 @@ http://localhost:3000
 
 ### Dockerコマンド
 
+#### ローカル開発モード（アプリケーションのみ）
+
 ```bash
 # アプリケーションの起動
 docker-compose up -d
@@ -167,6 +169,25 @@ docker-compose ps
 docker-compose down -v
 docker-compose up -d --build
 ```
+
+#### デプロイモード（Cloudflare Tunnel付き）
+
+Cloudflare Tunnelを使用して、アプリケーションを外部公開する場合：
+
+```bash
+# デプロイモードで起動（アプリケーション + Cloudflare Tunnel）
+docker-compose --profile deploy up -d
+
+# デプロイモードで停止
+docker-compose --profile deploy down
+
+# Cloudflare Tunnelのログを確認
+docker logs skilllens-cloudflared -f
+```
+
+**前提条件**:
+- `.cloudflared/config.yml` が設定されていること
+- Cloudflare Tunnelの認証情報が `~/.cloudflared/` に存在すること
 
 ### プロダクション vs 開発モード
 
