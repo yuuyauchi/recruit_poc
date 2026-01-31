@@ -6,41 +6,36 @@ node_modules/
 # Build outputs
 .next/
 out/
-dist/
 build/
+dist/
 
 # Database
 prisma/data/
-prisma/*.db
-prisma/*.db-journal
-*.sqlite
-*.sqlite3
-
-# Environment variables
-.env
-.env*.local
-.env.test
+*.db
+*.db-journal
 
 # Logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
-logs/
+
+# Environment files (may contain secrets)
+.env
+.env*.local
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# Testing
+# Test coverage
 coverage/
 .nyc_output/
 
@@ -49,17 +44,19 @@ tmp/
 temp/
 *.tmp
 
-# Lock files (often very large)
+# Cloudflare Tunnel credentials
+.cloudflared/
+
+# Prompt files
+prompt*.txt
+
+# Git
+.git/
+
+# Package lock files (large and generated)
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
-# Vercel
-.vercel/
-
-# TypeScript
+# TypeScript build info
 *.tsbuildinfo
-next-env.d.ts
-
-# Git
-.git/
