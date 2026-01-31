@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable';
 import { registerAllModules } from 'handsontable/registry';
@@ -13,6 +13,12 @@ registerAllModules();
 interface ExcelLikeInterfaceProps {
   data: any[][];
   onLogEvent: (log: OperationLogData) => void;
+}
+
+// 公開するメソッドの型定義
+export interface ExcelLikeInterfaceRef {
+  getAnswerSheetData: () => any[][];
+  getSourceData: () => any[][];
 }
 
 // スピル範囲の型定義
@@ -33,10 +39,10 @@ interface Sheet {
   cellFormulas: Map<string, string>; // セルの数式を保存 (key: "row,col", value: "=FORMULA")
 }
 
-export default function ExcelLikeInterface({
+const ExcelLikeInterface = forwardRef<ExcelLikeInterfaceRef, ExcelLikeInterfaceProps>(function ExcelLikeInterface({
   data,
   onLogEvent,
-}: ExcelLikeInterfaceProps) {
+}, ref) {
   const hotRef = useRef<any>(null);
   const [selectedCell, setSelectedCell] = useState<string>('A1');
   const [formulaBarValue, setFormulaBarValue] = useState<string>('');
@@ -69,10 +75,22 @@ export default function ExcelLikeInterface({
     ];
   });
   const [activeSheetIndex, setActiveSheetIndex] = useState<number>(0);
-  
+
   // セルのスタイルを保存するMap（現在のシート用）
   const cellStylesRef = useRef<Map<string, Set<string>>>(sheets[activeSheetIndex].cellStyles);
   const borderMenuRef = useRef<HTMLDivElement>(null);
+
+  // 外部から呼び出せるメソッドを公開
+  useImperativeHandle(ref, () => ({
+    // 解答シート（index=1）のデータを取得
+    getAnswerSheetData: () => {
+      return sheets[1]?.data || [];
+    },
+    // データシート（index=0）のデータを取得
+    getSourceData: () => {
+      return sheets[0]?.data || [];
+    },
+  }));
 
   // ホームタブの機能ハンドラー
   const handleCopy = () => {
@@ -2135,4 +2153,6 @@ export default function ExcelLikeInterface({
       </div>
     </div>
   );
-}
+});
+
+export default ExcelLikeInterface;

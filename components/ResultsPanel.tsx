@@ -38,14 +38,91 @@ export default function ResultsPanel({ result, problemTitle }: ResultsPanelProps
         </div>
       </div>
 
+      {/* 統合スコアの内訳 */}
+      {result.breakdown && (
+        <div className="mb-8">
+          <div className="bg-purple-50 border-2 border-purple-300 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-purple-900 mb-4 flex items-center">
+              <span className="mr-2">📊</span>
+              スコア内訳
+            </h3>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="bg-white p-4 rounded-lg border border-purple-200">
+                <div className="text-sm text-purple-700 mb-1 font-semibold">プロセス評価</div>
+                <div className="text-3xl font-bold text-purple-900">
+                  {result.breakdown.processScore}点
+                </div>
+                <div className="text-xs text-gray-600 mt-1">
+                  (重み: {result.breakdown.processWeight * 100}%)
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-purple-200">
+                <div className="text-sm text-purple-700 mb-1 font-semibold">結果評価</div>
+                <div className="text-3xl font-bold text-purple-900">
+                  {result.breakdown.resultScore}点
+                </div>
+                <div className="text-xs text-gray-600 mt-1">
+                  (重み: {result.breakdown.resultWeight * 100}%)
+                </div>
+              </div>
+            </div>
+            <div className="text-center text-sm text-purple-800 font-medium">
+              = 総合スコア: {result.finalScore}点
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-8">
         <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
           <h3 className="text-xl font-semibold text-blue-900 mb-3">
-            判定: {result.method}
+            プロセス判定: {result.method}
           </h3>
           <p className="text-gray-700 leading-relaxed">{result.reasoning}</p>
         </div>
       </div>
+
+      {/* 結果評価の詳細 */}
+      {result.resultEvaluation && (
+        <div className="mb-8">
+          <div className="bg-green-50 border-l-4 border-green-500 p-6 rounded-lg">
+            <h3 className="text-xl font-semibold text-green-900 mb-3">
+              結果評価: {result.resultEvaluation.score}点
+            </h3>
+            <div className="mb-4">
+              <div className="grid grid-cols-4 gap-3 mb-3">
+                <div className="bg-white p-3 rounded border border-green-200">
+                  <div className="text-xs text-gray-600 mb-1">正解</div>
+                  <div className="text-lg font-bold text-green-600">
+                    {result.resultEvaluation.validation.correctCount}
+                  </div>
+                </div>
+                <div className="bg-white p-3 rounded border border-red-200">
+                  <div className="text-xs text-gray-600 mb-1">誤答</div>
+                  <div className="text-lg font-bold text-red-600">
+                    {result.resultEvaluation.validation.incorrectCount}
+                  </div>
+                </div>
+                <div className="bg-white p-3 rounded border border-orange-200">
+                  <div className="text-xs text-gray-600 mb-1">抽出漏れ</div>
+                  <div className="text-lg font-bold text-orange-600">
+                    {result.resultEvaluation.validation.missedCount}
+                  </div>
+                </div>
+                <div className="bg-white p-3 rounded border border-blue-200">
+                  <div className="text-xs text-gray-600 mb-1">正解率</div>
+                  <div className="text-lg font-bold text-blue-600">
+                    {result.resultEvaluation.validation.accuracy}%
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+              {result.resultEvaluation.feedback}
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-6 mb-8">
         <div className="bg-gray-50 p-4 rounded-lg">

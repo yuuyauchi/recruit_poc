@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { calculateScore } from '@/lib/scoreCalculator';
+import { calculateFinalScore } from '@/lib/scoreCalculator';
 import { getProblemById } from '@/lib/problemDefinitions';
 import { OperationLogData } from '@/lib/types';
 
 // スコアの計算と保存
 export async function POST(request: NextRequest) {
   try {
-    const { sessionId } = await request.json();
+    const { sessionId, answerSheetData, sourceData } = await request.json();
 
     if (!sessionId) {
       return NextResponse.json(
@@ -55,8 +55,19 @@ export async function POST(request: NextRequest) {
       data: JSON.parse(log.eventData),
     }));
 
-    // スコア計算
-    const result = calculateScore(operationLogs);
+    // 検索条件を課題から取得（デフォルトは「佐藤」、B列=1）
+    // 将来的には課題ごとに設定可能
+    const searchTerm = '佐藤';
+    const targetColumn = 1; // B列（氏名列）
+
+    // スコア計算（統合評価: プロセス + 結果）
+    const result = calculateFinalScore(
+      operationLogs,
+      answerSheetData || null,
+      sourceData || null,
+      searchTerm,
+      targetColumn
+    );
 
     // スコアを保存
     const testResult = await prisma.testResult.create({

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useParams } from 'next/navigation';
 import TaskPanel from '@/components/TaskPanel';
@@ -8,6 +8,7 @@ import ResultsPanel from '@/components/ResultsPanel';
 import { getProblemById } from '@/lib/problemDefinitions';
 import { loadCsvData, generateEmptyData } from '@/lib/loadCsvData';
 import { OperationLogData, ScoreResult } from '@/lib/types';
+import type { ExcelLikeInterfaceRef } from '@/components/ExcelLikeInterface';
 
 // ExcelLikeInterfaceを動的インポート（SSR回避）
 const ExcelLikeInterface = dynamic(
@@ -38,6 +39,9 @@ export default function TestPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<ScoreResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // ExcelLikeInterfaceへの参照
+  const excelRef = useRef<ExcelLikeInterfaceRef>(null);
 
   // 問題の検証
   useEffect(() => {
@@ -151,11 +155,24 @@ export default function TestPage() {
         throw new Error('Failed to save logs');
       }
 
-      // スコアを計算
+      // 解答シートとソースデータを取得
+      const answerSheetData = excelRef.current?.getAnswerSheetData() || null;
+      const sourceData = excelRef.current?.getSourceData() || null;
+
+      console.log('Submitting answer sheet data:', {
+        answerSheetRows: answerSheetData?.length || 0,
+        sourceDataRows: sourceData?.length || 0,
+      });
+
+      // スコアを計算（解答シートとソースデータを含む）
       const scoreResponse = await fetch('/api/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({
+          sessionId,
+          answerSheetData,
+          sourceData,
+        }),
       });
 
       if (!scoreResponse.ok) {
@@ -247,6 +264,7 @@ export default function TestPage() {
         <div className="flex-1 overflow-hidden">
           {sessionId && csvData ? (
             <ExcelLikeInterface
+              ref={excelRef}
               data={csvData}
               onLogEvent={handleLogEvent}
             />

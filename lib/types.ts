@@ -43,6 +43,27 @@ export interface ScoreResult {
     totalOperations: number;
     timeSpent: number; // seconds
   };
+  // 結果評価（追加）
+  resultEvaluation?: {
+    score: number;           // 結果評価スコア (0-100)
+    validation: {
+      correctCount: number;
+      incorrectCount: number;
+      missedCount: number;
+      totalCorrect: number;
+      accuracy: number;
+      precision: number;
+    };
+    feedback: string;
+  };
+  // 統合スコア（追加）
+  finalScore?: number;       // プロセス + 結果の統合スコア
+  breakdown?: {
+    processScore: number;    // プロセス評価スコア
+    resultScore: number;     // 結果評価スコア
+    processWeight: number;   // プロセスの重み (0-1)
+    resultWeight: number;    // 結果の重み (0-1)
+  };
 }
 
 // テストセッション

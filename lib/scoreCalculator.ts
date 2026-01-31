@@ -1,10 +1,11 @@
 import { OperationLogData, ScoreResult } from './types';
+import { validateAnswer, calculateResultScore, generateFeedback } from './answerValidator';
 
 /**
- * スコア計算ロジック
+ * スコア計算ロジック（プロセス評価のみ）
  * 操作ログから関数活用度を判定する
  */
-export function calculateScore(logs: OperationLogData[]): ScoreResult {
+export function calculateProcessScore(logs: OperationLogData[]): ScoreResult {
   // 検出する要素
   let hasAdvancedFormula = false;
   let hasFilter = false;
@@ -79,4 +80,75 @@ export function calculateScore(logs: OperationLogData[]): ScoreResult {
       timeSpent,
     },
   };
+}
+
+/**
+ * 統合評価: プロセス評価 + 結果評価
+ * @param logs 操作ログ
+ * @param answerSheet 解答シートのデータ
+ * @param sourceData 元データ（データシート）
+ * @param searchTerm 検索対象の文字列
+ * @param targetColumn 検索対象の列インデックス
+ */
+export function calculateFinalScore(
+  logs: OperationLogData[],
+  answerSheet: any[][] | null,
+  sourceData: any[][] | null,
+  searchTerm: string = '佐藤',
+  targetColumn: number = 1
+): ScoreResult {
+  // プロセス評価
+  const processResult = calculateProcessScore(logs);
+  const processScore = processResult.score;
+
+  // 結果評価（解答シートとソースデータがある場合のみ）
+  let resultScore = 0;
+  let resultEvaluation = undefined;
+
+  if (answerSheet && sourceData && answerSheet.length > 0 && sourceData.length > 0) {
+    const { validation, details } = validateAnswer(
+      answerSheet,
+      sourceData,
+      searchTerm,
+      targetColumn
+    );
+
+    resultScore = calculateResultScore(validation);
+    const feedback = generateFeedback(validation, resultScore);
+
+    resultEvaluation = {
+      score: resultScore,
+      validation,
+      feedback,
+    };
+  }
+
+  // 統合スコアの計算
+  const processWeight = 0.5; // 50%
+  const resultWeight = 0.5;  // 50%
+
+  const finalScore = resultEvaluation
+    ? Math.round(processScore * processWeight + resultScore * resultWeight)
+    : processScore; // 結果評価がない場合はプロセススコアのみ
+
+  return {
+    ...processResult,
+    score: finalScore, // 統合スコアをメインスコアとして設定
+    resultEvaluation,
+    finalScore,
+    breakdown: resultEvaluation ? {
+      processScore,
+      resultScore,
+      processWeight,
+      resultWeight,
+    } : undefined,
+  };
+}
+
+/**
+ * 後方互換性のため、既存のcalculateScore関数を維持
+ * プロセス評価のみを実行
+ */
+export function calculateScore(logs: OperationLogData[]): ScoreResult {
+  return calculateProcessScore(logs);
 }
